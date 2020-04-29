@@ -1,1 +1,1 @@
-web: gunicorn deploy:Table2
+web: gunicorn run:server
