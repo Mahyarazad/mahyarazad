@@ -331,6 +331,5 @@ def sell_out(brand,province,account,product):
 	return figure
 
 if __name__ == '__main__':
-    app.run_server(debug=True, port=8054,dev_tools_ui=False, dev_tools_props_check=False)
-    plotly.offline.plot(data, filename='file.html')
-    plotly.offline.plot(data, include_plotlyjs=False, output_type='div')
+    app.run_server()
+# (debug=True, port=8054,dev_tools_ui=False, dev_tools_props_check=False)
