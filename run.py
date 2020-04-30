@@ -16,12 +16,12 @@ import numpy as np
 import base64
 from io import BytesIO
 
-path  = "D:/Data/Py_Files/*.xlsx"
-save_path = "D:/Data/Py_Files"
-filenames = []
-for i in glob.iglob(path, recursive=True):
-    filenames.append(i)
-df = pd.read_excel(filenames[0])
+# path  = "D:/Data/Py_Files/*.xlsx"
+# save_path = "D:/Data/Py_Files"
+# filenames = []
+# for i in glob.iglob(path, recursive=True):
+#     filenames.append(i)
+df = pd.read_excel(base.xlsx)
 
 # df.iloc[0:,-2] = df.iloc[0:,-2].apply(lambda x: x.strftime('%d-%m-%Y'))
 
