@@ -142,7 +142,7 @@ df = df.pivot_table(index = [df.columns[1],df.columns[2],df.columns[3],df.column
 app = dash.Dash(__name__, external_stylesheets = [
         'https://codepen.io/chriddyp/pen/bWLwgP.css'
     ])
-
+server = app.server
 app.layout = html.Div([
 	dcc.Tabs([
 		dcc.Tab(label='Provincial Dashboard',style = {
