@@ -1,5 +1,7 @@
 
 # import Update
+import os
+from random import randint
 import flask
 import dash
 from dash.dependencies import Input, Output
@@ -18,7 +20,7 @@ import numpy as np
 # filenames = []
 # for i in glob.iglob(path, recursive=True):
 #     filenames.append(i)
-df = pd.read_excel("base.xlsx")
+df = pd.read_excel("Base.xlsx")
 
 # df.iloc[0:,-2] = df.iloc[0:,-2].apply(lambda x: x.strftime('%d-%m-%Y'))
 
@@ -135,8 +137,9 @@ df = df.pivot_table(index = [df.columns[1],df.columns[2],df.columns[3],df.column
 
 
 ####### Main App ######
-
-app = dash.Dash(__name__, external_stylesheets = [
+server = flask.Flask(__name__)
+server.secret_key = os.environ.get('secret_key', str(randint(0, 1000000)))
+app = dash.Dash(__name__,server=server ,external_stylesheets = [
         'https://codepen.io/chriddyp/pen/bWLwgP.css'
     ])
 server = app.server
@@ -328,5 +331,5 @@ def sell_out(brand,province,account,product):
 	return figure
 
 if __name__ == '__main__':
-    app.run_server()
+    app.run_server(debug=True, threaded=True)
 # (debug=True, port=8054,dev_tools_ui=False, dev_tools_props_check=False)

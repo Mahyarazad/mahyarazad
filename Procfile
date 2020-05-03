@@ -1,1 +1,1 @@
-web: gunicorn run:server
+web: gunicorn regionaldata:server --timeout 300
