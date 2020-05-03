@@ -126,7 +126,6 @@ pyrsistent==0.15.7
 PyScreeze==0.1.25
 python-dateutil==1.5
 PyTweening==1.0.3
-pywinpty==0.5.7
 PyYAML==5.3
 pyzmq==18.1.1
 queuelib==1.5.0
