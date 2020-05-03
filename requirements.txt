@@ -12,4 +12,4 @@ pandas==0.25.1
 gunicorn==20.0.4
 pyexcel==0.5.15
 plotly==4.6.0
-importlib==31.2
+io==15.2
