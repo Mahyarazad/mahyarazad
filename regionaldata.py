@@ -20,7 +20,8 @@ import numpy as np
 # filenames = []
 # for i in glob.iglob(path, recursive=True):
 #     filenames.append(i)
-url = 'https://github.com/Mahyarazad/mahyarazad/raw/master/base.xlsx'
+
+url = 'https://github.com/Mahyarazad/mahyarazad/raw/master/Base.xlsx'
 df = pd.read_excel(url)
 
 # df.iloc[0:,-2] = df.iloc[0:,-2].apply(lambda x: x.strftime('%d-%m-%Y'))
