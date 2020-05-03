@@ -143,7 +143,7 @@ server.secret_key = os.environ.get('secret_key', str(randint(0, 1000000)))
 app = dash.Dash(__name__,server=server ,external_stylesheets = [
         'https://codepen.io/chriddyp/pen/bWLwgP.css'
     ])
-server = app.server
+
 app.layout = html.Div([
 	dcc.Tabs([
 		dcc.Tab(label='Provincial Dashboard',style = {
