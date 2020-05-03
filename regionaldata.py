@@ -21,7 +21,7 @@ import numpy as np
 # for i in glob.iglob(path, recursive=True):
 #     filenames.append(i)
 url = 'https://github.com/Mahyarazad/mahyarazad/raw/master/base.csv'
-df = pd.read_csv(url,sep=",")
+df = pd.read_csv(url,sep=",",encoding='utf-16')
 
 # df.iloc[0:,-2] = df.iloc[0:,-2].apply(lambda x: x.strftime('%d-%m-%Y'))
 
