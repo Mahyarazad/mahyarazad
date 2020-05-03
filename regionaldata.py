@@ -21,7 +21,7 @@ import numpy as np
 # for i in glob.iglob(path, recursive=True):
 #     filenames.append(i)
 url = 'https://github.com/Mahyarazad/mahyarazad/raw/master/base.csv'
-df = pd.read_csv(url,sep=",",encoding='utf-16')
+df = pd.read_csv(url,sep=",",encoding='UTF-8')
 
 # df.iloc[0:,-2] = df.iloc[0:,-2].apply(lambda x: x.strftime('%d-%m-%Y'))
 
@@ -332,5 +332,5 @@ def sell_out(brand,province,account,product):
 	return figure
 
 if __name__ == '__main__':
-    app.run_server(debug=True, threaded=True)
+    app.server.run(debug=True, threaded=True)
 # (debug=True, port=8054,dev_tools_ui=False, dev_tools_props_check=False)
