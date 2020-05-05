@@ -31,7 +31,7 @@ df[df.columns[2]].replace(to_replace = 'GLOBAL CO.FOR TECHNOLOGY,MOBILE DEVICES&
 df[df.columns[2]].replace(to_replace = 'Euro Telecom FZE',value= 'Euro',inplace=True)
 pd.set_option('display.max_columns',None)
 
-#### Adding Subtotal to the Base file ####
+#### Adding Subtotal to the Base dataframe ####
 
 collist = list(df.columns)
 subtotalacc = pd.DataFrame()
@@ -41,6 +41,13 @@ subtotalacc = df.pivot_table(index =
 subtotalacc['Product'],subtotalacc['Product Model'],subtotalacc['Product Family'] ='All','All','All'
 subtotalacc = subtotalacc[collist]
 df = pd.concat([subtotalacc,df])
+
+subtotalregion = pd.DataFrame()
+subtotalregion = subtotalregion[subtotalregion.columns[0]=='Iraq']
+subtotalregion = df.pivot_table(index = 
+	[df.columns[0],df.columns[1],df.columns[2],df.columns[3],df.columns[-2]],
+	values=df.columns[-1],aggfunc=sum).reset_index()
+
 
 ##########################################
 
