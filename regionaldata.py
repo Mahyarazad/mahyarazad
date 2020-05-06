@@ -151,7 +151,8 @@ server.secret_key = os.environ.get('secret_key', str(randint(0, 1000000)))
 app = dash.Dash(__name__,server=server ,external_stylesheets = [
         'https://codepen.io/chriddyp/pen/bWLwgP.css'
     ])
-
+app.scripts.config.serve_locally = True
+app.css.config.serve_locally = True
 app.layout = html.Div([
 	dcc.Tabs([
 		dcc.Tab(label='Provincial Dashboard',style = {
@@ -326,14 +327,17 @@ def sell_out(brand,province,account,product):
                 family='Courier New, monospace',
                 size=10,
                 color='#7f7f7f'
-            )),
+
+            )
+                'range' : [min(df[(df[df.columns[0]].isin(province))&(df[df.columns[3]].isin(product))&(df[df.columns[1]].isin(account))].sum().index[4:]),max(df[(df[df.columns[0]].isin(province))&(df[df.columns[3]].isin(product))&(df[df.columns[1]].isin(account))].sum().index[4:])]),
             'yaxis' : dict(
                 # title='y Axis',
                 titlefont=dict(
                 family='Helvetica, monospace',
                 size=10,
                 color='#7f7f7f'
-            ))
+            )
+                'range' : [min(df[(df[df.columns[0]].isin(province))&(df[df.columns[3]].isin(product))&(df[df.columns[1]].isin(account))].sum().values[4:]),max(df[(df[df.columns[0]].isin(province))&(df[df.columns[3]].isin(product))&(df[df.columns[1]].isin(account))].sum().values[4:])])
         }
     }
 
