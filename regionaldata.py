@@ -329,7 +329,11 @@ def sell_out(brand,province,account,product):
                 family='Helvetica, monospace',
                 size=10,
                 color='#7f7f7f')
-                )     
+                ),
+            'transition': {
+            	'duration' : 500,
+            	'easing' : 'cubic-in-out' 	
+            	}       
         }
     }
 
