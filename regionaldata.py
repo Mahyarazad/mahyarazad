@@ -42,12 +42,6 @@ subtotalacc['Product'],subtotalacc['Product Model'],subtotalacc['Product Family'
 subtotalacc = subtotalacc[collist]
 df = pd.concat([subtotalacc,df])
 
-subtotalregion = pd.DataFrame()
-subtotalregion = subtotalregion[subtotalregion.columns[0]=='Iraq']
-subtotalregion = df.pivot_table(index = 
-	[df.columns[0],df.columns[1],df.columns[2],df.columns[3],df.columns[-2]],
-	values=df.columns[-1],aggfunc=sum).reset_index()
-
 
 ##########################################
 
@@ -326,17 +320,16 @@ def sell_out(brand,province,account,product):
                 titlefont=dict(
                 family='Courier New, monospace',
                 size=10,
-                color='#7f7f7f'
+                color='#7f7f7f')
 
-            )),
+            ),
             'yaxis' : dict(
                 # title='y Axis',
                 titlefont=dict(
                 family='Helvetica, monospace',
                 size=10,
-                color='#7f7f7f'
-            ))
-
+                color='#7f7f7f')
+                )     
         }
     }
 
