@@ -19,7 +19,8 @@ import numpy as np
 # for i in glob.iglob(path, recursive=True):
 #     filenames.append(i)
 
-url = 'https://github.com/Mahyarazad/mahyarazad/blob/master/Base.xlsx'
+url = 'https://github.com/Mahyarazad/mahyarazad/raw/master/Base.xlsx'
+
 df = pd.read_excel(url)
 
 
