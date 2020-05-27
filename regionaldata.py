@@ -19,10 +19,9 @@ url = 'https://github.com/Mahyarazad/mahyarazad/raw/master/Base.xlsx'
 df = pd.read_excel(url)
 
 #####  DataFrame Reshaping #####
-
+sd = reshape(df).summation
 city_data = reshape(df).dict_data_gen
 cv = reshape(df).geo
-df = reshape(df).summation
 cvt = cv.drop(columns = [cv.columns[3],cv.columns[4]])
 cvt['MOM Ratio'] = ((cvt[cvt.columns[-1]]- cvt[cvt.columns[-2]])/cvt[cvt.columns[-2]]).apply('{:.0%}'.format)
 cvt = cvt.sort_values(by=cvt.columns[3],ascending = False)
@@ -405,7 +404,7 @@ app.layout = html.Div([
 					    style={'height': '400px !important', 'width': '200px','font-size': "100%",'border-radius': '6px'},
 					    value = '',
 					    options=[
-					        {'label': i, 'value':i} for i in df[df.columns[0]].unique()]
+					        {'label': i, 'value':i} for i in sd[sd.columns[0]].unique()]
 					    ),
 					    html.Br(),
 					    dcc.Dropdown(
@@ -414,7 +413,7 @@ app.layout = html.Div([
 					    value = '',
 					    multi = True,
 					    options=[
-					        {'label': i, 'value':i} for i in df[df.columns[3]].unique()
+					        {'label': i, 'value':i} for i in sd[sd.columns[3]].unique()
 					        ] 
 					    ),
 					    html.Br()
@@ -468,7 +467,7 @@ app.layout = html.Div([
                             style={'height': '400px !important', 'width': '200px','font-size': "100%",'border-radius': '6px'},
                             value = 'All',
                             options=[
-                                {'label': i, 'value':i} for i in df[df.columns[0]].unique()]
+                                {'label': i, 'value':i} for i in sd[sd.columns[0]].unique()]
                             ),
                             html.Br(),
                             dcc.Dropdown(
@@ -477,7 +476,7 @@ app.layout = html.Div([
                             value = 'Baghdād',
                             multi = True,
                             options=[
-                                {'label': i, 'value':i} for i in df[df.columns[3]].unique()
+                                {'label': i, 'value':i} for i in sd[sd.columns[3]].unique()
                                 ] 
                             ),
                             html.Br()
@@ -532,7 +531,7 @@ def set_cities_options(selected_region):
     Input('Product','value')])
 def update_text(province,account,brand,product):
 
-    return '{} Province,{} account and, {} product has been selected'.format(province,account,product,df[df.columns[1]].isin(all_options[brand]).index[4:])
+    return '{} Province,{} account and, {} product has been selected'.format(province,account,product,sd[sd.columns[1]].isin(all_options[brand]).index[4:])
 
 @app.callback(
     Output('sell_out','figure'),
@@ -546,8 +545,8 @@ def sell_out(brand,province,account,product):
 		color = 'E94713' 
 	else:
 		color = '3CBCD6'
-	data = [{'x': df[(df[df.columns[0]].isin(province))&(df[df.columns[3]].isin(product))&(df[df.columns[1]].isin(account))].sum().index[4:],
-            'y': df[(df[df.columns[0]].isin(province))&(df[df.columns[3]].isin(product))&(df[df.columns[1]].isin(account))].sum().values[4:],
+	data = [{'x': sd[(sd[sd.columns[0]].isin(province))&(sd[sd.columns[3]].isin(product))&(sd[sd.columns[1]].isin(account))].sum().index[4:],
+            'y': sd[(sd[sd.columns[0]].isin(province))&(sd[sd.columns[3]].isin(product))&(sd[sd.columns[1]].isin(account))].sum().values[4:],
             'type': 'line',
             'marker': {'color': color}}]
 
@@ -556,21 +555,20 @@ def sell_out(brand,province,account,product):
         'layout': {
             'title': province,
             'xaxis' : dict(
-                # title='x Axis',
+
                 titlefont=dict(
                 family='Courier New, monospace',
                 size=10,
                 color='#7f7f7f'),
-                # range = [df[(df[df.columns[0]].isin(province))&(df[df.columns[3]].isin(product))&(df[df.columns[1]].isin(account))].sum().index[4:].min(),df[(df[df.columns[0]].isin(province))&(df[df.columns[3]].isin(product))&(df[df.columns[1]].isin(account))].sum().index[4:].max()]
-
+                
             ),
             'yaxis' : dict(
-                # title='y Axis',
+
                 titlefont=dict(
                 family='Helvetica, monospace',
                 size=10,
                 color='#7f7f7f'),
-                # range = [df[df.columns[-2]].min(),df[df.columns[-2]].max()]
+
                 
             ),
             'transition': {
@@ -615,7 +613,7 @@ def set_cities_options(selected_region2):
     Input('Product2','value')])
 def update_text(province2,account2,brand2,product2):
 
-    return '{} Province,{} account and, {} product has been selected'.format(province2,account2,product2,df[df.columns[1]].isin(all_options[brand2]).index[4:])
+    return '{} Province,{} account and, {} product has been selected'.format(province2,account2,product2,sd[sd.columns[1]].isin(all_options[brand2]).index[4:])
 
 @app.callback(
     Output('sell_out2','figure'),
@@ -629,8 +627,8 @@ def sell_out(brand2,province2,account2,product2):
 		color = 'E94713' 
 	else:
 		color = '3CBCD6'
-	data = [{'x': df[(df[df.columns[0]].isin(province2))&(df[df.columns[3]].isin(product2))&(df[df.columns[1]].isin(account2))].sum().index[4:],
-            'y': df[(df[df.columns[0]].isin(province2))&(df[df.columns[3]].isin(product2))&(df[df.columns[1]].isin(account2))].sum().values[4:],
+	data = [{'x': sd[(sd[sd.columns[0]].isin(province2))&(sd[sd.columns[3]].isin(product2))&(sd[sd.columns[1]].isin(account2))].sum().index[4:],
+            'y': sd[(sd[sd.columns[0]].isin(province2))&(sd[sd.columns[3]].isin(product2))&(sd[sd.columns[1]].isin(account2))].sum().values[4:],
             'type': 'line',
             'marker': {'color': color}}]
 
@@ -639,21 +637,18 @@ def sell_out(brand2,province2,account2,product2):
         'layout': {
             'title': province2,
             'xaxis' : dict(
-                # title='x Axis',
                 titlefont=dict(
                 family='Courier New, monospace',
                 size=10,
                 color='#7f7f7f'),
-                # range = [df[(df[df.columns[0]].isin(province))&(df[df.columns[3]].isin(product))&(df[df.columns[1]].isin(account))].sum().index[4:].min(),df[(df[df.columns[0]].isin(province))&(df[df.columns[3]].isin(product))&(df[df.columns[1]].isin(account))].sum().index[4:].max()]
+                
 
             ),
             'yaxis' : dict(
-                # title='y Axis',
                 titlefont=dict(
                 family='Helvetica, monospace',
                 size=10,
                 color='#7f7f7f'),
-                # range = [df[df.columns[-2]].min(),df[df.columns[-2]].max()]
                 
             ),
             'transition': {
@@ -664,6 +659,7 @@ def sell_out(brand2,province2,account2,product2):
     }
 
 	return figure
+
 ################## Second Tab ###################
 
 @app.callback(
@@ -688,14 +684,14 @@ def update_image_src(selector):
         'layout': {
 
             'xaxis' : dict(
-                # title='x Axis',
+
                 titlefont=dict(
                 family='Courier New, monospace',
                 size=10,
                 color='#7f7f7f'
             )),
             'yaxis' : dict(
-                # title='y Axis',
+
                 titlefont=dict(
                 family='Helvetica, monospace',
                 size=20,
@@ -723,14 +719,14 @@ def update_image_src(selector):
         'layout': {
 
             'xaxis' : dict(
-                # title='x Axis',
+
                 titlefont=dict(
                 family='Courier New, monospace',
                 size=10,
                 color='#7f7f7f'
             )),
             'yaxis' : dict(
-                # title='y Axis',
+
                 titlefont=dict(
                 family='Helvetica, monospace',
                 size=10,

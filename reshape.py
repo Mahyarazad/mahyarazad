@@ -93,7 +93,6 @@ class reshape:
 		self.df[self.df.columns[2]].replace(to_replace = 'NAZO GENERAL TRADING LLC',value= 'Global',inplace=True)
 		self.df[self.df.columns[2]].replace(to_replace = 'GLOBAL CO.FOR TECHNOLOGY,MOBILE DEVICES&ELECTRONIC APPLIANCES LTD',value= 'Global',inplace=True)
 		self.df[self.df.columns[2]].replace(to_replace = 'Euro Telecom FZE',value= 'Euro',inplace=True)
-		#### Adding Subtotal to the Base dataframe ####
 		collist = list(self.df.columns)
 		subtotalacc = pd.DataFrame()
 		subtotalacc = self.df.pivot_table(index = 
@@ -101,11 +100,11 @@ class reshape:
 			values=self.df.columns[-1],aggfunc=sum).reset_index()
 		subtotalacc['Product'],subtotalacc['Product Model'],subtotalacc['Product Family'] ='All','All','All'
 		subtotalacc = subtotalacc[collist]
-		self.df = pd.concat([subtotalacc,self.df])
-		self.df = self.df[self.df[self.df.columns[0]]=='Iraq']
-		self.df = self.df.sort_values(by = 'Sell Out Date')
-		self.df = self.df.pivot_table(index = [self.df.columns[1],self.df.columns[2],self.df.columns[3],self.df.columns[5]], columns = self.df.columns[-2], values = self.df.columns[-1], aggfunc = sum).reset_index()
-		return self.df
+		df = pd.concat([subtotalacc,self.df])
+		df = df[df[df.columns[0]]=='Iraq']
+		df = df.sort_values(by = 'Sell Out Date')
+		df = df.pivot_table(index = [df.columns[1],df.columns[2],df.columns[3],df.columns[5]], columns = df.columns[-2], values = df.columns[-1], aggfunc = sum).reset_index()
+		return df
 
 	@property
 	def geo(self):
@@ -121,6 +120,6 @@ class reshape:
 		cv = pd.merge(cv,df[[df.columns[0],df.columns[1],df.columns[2]]],on = df.columns[0],how = 'left')
 		cv = cv.rename(columns = {cv.columns[-1]:'Activation for ' + str(cv.columns[-1]),
 								  cv.columns[-2]:'Activation for ' + str(cv.columns[-2])})
-
 		return cv
+		
 		
