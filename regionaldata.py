@@ -8,42 +8,27 @@ import dash_table
 import dash_core_components as dcc
 import dash_html_components as html
 import pandas as pd
-from datetime import date
-import glob 
 import numpy as np
+import plotly.express as px
+import plotly.graph_objects as go
+from reshape import reshape
 
 
-# path  = "D:/Data/Py_Files/*.xlsx"
-# save_path = "D:/Data/Py_Files"
-# filenames = []
-# for i in glob.iglob(path, recursive=True):
-#     filenames.append(i)
 
 url = 'https://github.com/Mahyarazad/mahyarazad/raw/master/Base.xlsx'
-
 df = pd.read_excel(url)
 
+#####  DataFrame Reshaping #####
 
-# df.iloc[0:,-2] = df.iloc[0:,-2].apply(lambda x: x.strftime('%d-%m-%Y'))
-
-df[df.columns[2]].replace(to_replace = 'NAZO GENERAL TRADING LLC',value= 'Global',inplace=True)
-df[df.columns[2]].replace(to_replace = 'GLOBAL CO.FOR TECHNOLOGY,MOBILE DEVICES&ELECTRONIC APPLIANCES LTD',value= 'Global',inplace=True)
-df[df.columns[2]].replace(to_replace = 'Euro Telecom FZE',value= 'Euro',inplace=True)
-pd.set_option('display.max_columns',None)
-
-#### Adding Subtotal to the Base dataframe ####
-
-collist = list(df.columns)
-subtotalacc = pd.DataFrame()
-subtotalacc = df.pivot_table(index = 
-	[df.columns[0],df.columns[1],df.columns[2],df.columns[3],df.columns[-2]],
-	values=df.columns[-1],aggfunc=sum).reset_index()
-subtotalacc['Product'],subtotalacc['Product Model'],subtotalacc['Product Family'] ='All','All','All'
-subtotalacc = subtotalacc[collist]
-df = pd.concat([subtotalacc,df])
+city_data = reshape(df).dict_data_gen
+cv = reshape(df).geo
+df = reshape(df).summation
+cvt = cv.drop(columns = [cv.columns[3],cv.columns[4]])
+cvt['MOM Ratio'] = ((cvt[cvt.columns[-1]]- cvt[cvt.columns[-2]])/cvt[cvt.columns[-2]]).apply('{:.0%}'.format)
+cvt = cvt.sort_values(by=cvt.columns[3],ascending = False)
 
 
-##########################################
+#################################
 
 
 north_list = [
@@ -126,18 +111,7 @@ all_options_p = {'HUAWEI': ['All',
 							'HONOR 10i',
 							'Honor 10 Lite']}
 
-df = df[df[df.columns[0]]=='Iraq']
-df = df.sort_values(by = 'Sell Out Date')
-df = df.pivot_table(index = [df.columns[1],df.columns[2],df.columns[3],df.columns[5]], columns = df.columns[-2], values = df.columns[-1], aggfunc = sum).reset_index()
 
-##### Test Print ###### 
-
-# print(df[(df[df.columns[0]]=='Dahūk')&(df[df.columns[3]]=='Y9s')&(df[df.columns[1]].isin(all_options['HUAWEI']))].sum().index[4:])
-
-
-##### Second Tab Processing######
-
-df2 = pd.read_excel(url)
 pd_list = {'Product':['Mate 30 Pro',
                 'nova 5T',
                 'P smart 2019',
@@ -173,7 +147,7 @@ all_options_t = {'South':[
                 'Arbīl',
                 'Nīnawá',
                 'Şalāḩ ad Dīn']}
-#,'All':[]
+
 pd_list2 = ['Mate 30 Pro',
                 'nova 5T',
                 'P smart 2019',
@@ -190,56 +164,103 @@ pd_list2 = ['Mate 30 Pro',
                 'Y9 2019',
                 'Y9 Prime 2019',
                 'Y9s']
-def south(df):
 
-    df = df[(df[df.columns[1]].isin(south_list))&(df[df.columns[-4]].isin(pd_list2))]
-    df = df.pivot_table(index=df.columns[1],columns=df.columns[-2],values = df.columns[-1],aggfunc=sum).reset_index()
-    return df
-
-def north(df):
-    df = df[(df[df.columns[1]].isin(north_list))&(df[df.columns[-4]].isin(pd_list2))]
-    df = df.pivot_table(index=df.columns[1],columns=df.columns[-2],values = df.columns[-1],aggfunc=sum).reset_index()
-    return df
+#### Map and Table
 
 
-city_data = south(df2)
-city_data2 = north(df2)
-city_data = pd.concat([city_data,city_data2])
-city_data.set_index(['Sell Out Province'],inplace = True)
-col_list = []
-deleteList = []
-for col in range(0,int(city_data.shape[1])):
-    col_list.append(str(city_data.columns[col])[0:10])
-    deleteList.append(col)
-city_data.columns = col_list
-date_list = city_data.columns.values.tolist()
-md = city_data.reset_index()
-mdr = []
-mdc = []
-for rows in range(0,md.shape[0]):
-    mdr = []
-    for col in range(1,md.shape[1]):
-        mdr.append(md.iloc[rows,col])
-    mdc.append(list(mdr))
-city_data['SO'] = mdc
-city_data['Date'] = [date_list] * len(city_data)
-city_data = city_data.drop(city_data.columns[deleteList], axis=1)
-city_data.unstack()
-city_data = city_data.transpose()
-city_data = city_data.to_dict()
+ccs=px.colors.sequential.Plasma_r
+fig = go.Figure()
+fig.add_trace(go.Scattermapbox(
+        lat=cv[cv.columns[3]],
+        lon=cv[cv.columns[4]],
+        mode='markers',
+        marker=go.scattermapbox.Marker(
+            size=(cv[cv.columns[6]]/(cv[cv.columns[6]].min()/2.5)),
+            color= cv[cv.columns[6]],
+            opacity=0.6,
+            showscale=True,
+            colorscale = px.colors.sequential.Blackbody,
+            cmin=min(cv[cv.columns[-1]]),
+            cmax=max(cv[cv.columns[-1]])
+        ),
+        meta = [cv.columns[-1],cv.columns[-2]],
+        hoverinfo= 'all',
+        text = cv,
+        hovertext = cv.iloc[:,1:],
+        hovertemplate=
+        " System Name: %{text[0]} <br>" +
+		"<extra></extra>" +
+        "<b> Province Name: %{text[1]}</b><br><br>" +
+        "<b>Accumulated %{meta[0]}: %{text[5]:,}</b><br>" +
+        "<b>Accumulated %{meta[1]}: %{text[6]:,}</b><br>" +
+        "<span style='color: Cornsilk'>Population at 2018: %{text[2]:,} Thousand</span> <br>"
+
+    ))
+
+fig.update_layout(
+    autosize=True,
+    hovermode='closest',
+    showlegend=False,
+    mapbox=dict(
+        accesstoken='pk.eyJ1IjoibWFoeWFyYXphZCIsImEiOiJjazh3cHk2eWUwY3huM29xb29meXV1bGV2In0.kKV6XDb8gngFsl4EZMeXPg',
+        bearing=0,
+        center=dict(
+            lat=33.67,
+            lon=44
+        ),
+        pitch=0,
+        zoom=5,
+        style='light'
+    ),
+    height =800
+)
+
+
+
+table = go.Figure(data = [go.Table(
+	header = dict(
+		values = [cvt.columns[0],cvt.columns[-3],cvt.columns[-2],cvt.columns[-1]],
+		fill_color = 'royalblue',
+		line_color='darkslategray',
+		align = 'center',
+	    font=dict(color='white', size=13),
+    	height=40
+		),
+	cells = dict(values = 
+		[cvt[cvt.columns[0]],cvt[cvt.columns[-3]],cvt[cvt.columns[-2]],cvt[cvt.columns[-1]]],
+	fill_color = 'lavender',
+	align = ['left','center','center','center'],
+	line_color='darkslategray',
+	font_size = 12,
+	height = 20))
+	# uirevision = colorbar_title),
+
+
+])
+
+table.update_layout(
+	height = 800,
+	width = 600
+	)
+
 
 ####### Main App ######
 server = flask.Flask(__name__)
 server.secret_key = os.environ.get('secret_key', str(randint(0, 1000000)))
-app = dash.Dash(__name__,server=server ,external_stylesheets = [
+
+app = dash.Dash(__name__,server=server,
+                external_stylesheets = [
         'https://codepen.io/chriddyp/pen/bWLwgP.css'
-    ])
-app.scripts.config.serve_locally = True
-app.css.config.serve_locally = True
-app.title = 'Iraq Sales Status'
+    ]
+                )
+
+# app.scripts.config.serve_locally = True
+# app.css.config.serve_locally = True
+app.title = 'Iraq Device Business Summary'
 app.layout = html.Div([
+	# html.Link(href='regionaldata.css', rel='stylesheet'),
 	dcc.Tabs([
-		dcc.Tab(label='Provincial Dashboard',style = {
+		dcc.Tab(label='HUAWEI Distribution and Sales Figure',style = {
 			    'borderBottom': '1px solid #d6d6d6',
 			    'padding': '6px',
 			    'fontWeight': 'bold'
@@ -252,7 +273,97 @@ app.layout = html.Div([
 			    'color': 'white',
 			    'padding': '6px'
 			},children=[
-				    html.Div([
+			html.H2('Iraq Activated Stock Distribution'),
+			html.Div(
+	            [
+	            html.Div([
+	                dcc.Graph(
+	                    figure=fig
+	                        )
+	                    ], className= 'seven columns'
+	                ),
+
+	                html.Div([
+	                dcc.Graph(
+	                    figure = table
+
+	                )
+	                ], className= 'five columns'
+	                )
+	            ], className="row"),
+
+			html.Br(),
+			html.H2('HUAWEI Handset Activation Trend'),	
+	        html.Div(
+	            [
+	                html.Div(
+	                    [
+	                        html.P('Choose Province:'),
+	                        dcc.Checklist(
+	                                id = 'Cities',
+	                                options=[
+	                                    {'label': 'Al Qādisīyah', 'value': 'Al Qādisīyah'},
+	                                    {'label': 'Bābil', 'value': 'Bābil'},
+	                                ],
+	                                value=['Bābil', 'Al Qādisīyah'],
+	                                labelStyle={'display': 'inline-block'}
+	                        ),
+	                    ],
+	                    className='six columns',
+	                    style={'margin-top': '10'}
+	                ),
+	                html.Div(
+	                    [
+	                        html.P('Choose Region:'),
+	                        dcc.RadioItems(
+	                                id = 'Country',
+	                                options=[{'label': k, 'value': k} for k in all_options_t.keys()],
+	                                value='All',
+	                                labelStyle={'display': 'inline-block'}
+	                        ),
+	                    ],
+	                    className='six columns',
+	                    style={'margin-top': '10'}
+	                ),    
+	            ], className="row"
+	        ),
+
+	        html.Div(
+	            [
+	            html.Div([
+	                dcc.Graph(
+	                    id='example-graph'
+	                        )
+	                    ], className= 'six columns'
+	                ),
+
+	                html.Div([
+	                dcc.Graph(
+	                    id='example-graph-2',
+
+	                )
+	                ], className= 'six columns'
+	                )
+	            ], className="row")
+		]),
+
+		dcc.Tab(label = 'Distribution Trend Dashboard',style = {
+			    'borderBottom': '1px solid #d6d6d6',
+			    'padding': '6px',
+			    'fontWeight': 'bold'
+			},
+
+			selected_style = {
+			    'borderTop': '1px solid #d6d6d6',
+			    'borderBottom': '1px solid #d6d6d6',
+			    'backgroundColor': '#119DFF',
+			    'color': 'white',
+			    'padding': '6px'
+			}, children = [
+						html.H3('HUAWEI and HONOR Device Sales Trend'),
+						html.P('If you choose "ALL product" in the second dropdown, please unchek the shipping account (Global, Euro or, Jibal) before swtiching to other brand, otherwise it shows the summation over both brands.',
+							style = {'color':'red'}),
+       				    html.Div([
                         html.Div([
 				    	html.Br(),
 				    	html.Br(),
@@ -292,7 +403,7 @@ app.layout = html.Div([
 					    id = 'Province',
 					    multi = True,
 					    style={'height': '400px !important', 'width': '200px','font-size': "100%",'border-radius': '6px'},
-					    value = 'Baghdād',
+					    value = '',
 					    options=[
 					        {'label': i, 'value':i} for i in df[df.columns[0]].unique()]
 					    ),
@@ -300,7 +411,7 @@ app.layout = html.Div([
 					    dcc.Dropdown(
 					    id = 'Product',
 					    style={'height': '30px', 'width': '200px'},
-					    value = 'All',
+					    value = '',
 					    multi = True,
 					    options=[
 					        {'label': i, 'value':i} for i in df[df.columns[3]].unique()
@@ -380,77 +491,13 @@ app.layout = html.Div([
                         ],className = 'nine columns'),
                     ],className = "row"),    
                 ]),
+ 	],className = 'ten columns offset-by-one')
+],className = 'ten columns offset-by-one')	
 
-		dcc.Tab(label = 'Huawei Sales Trend',style = {
-			    'borderBottom': '1px solid #d6d6d6',
-			    'padding': '6px',
-			    'fontWeight': 'bold'
-			},
 
-			selected_style = {
-			    'borderTop': '1px solid #d6d6d6',
-			    'borderBottom': '1px solid #d6d6d6',
-			    'backgroundColor': '#119DFF',
-			    'color': 'white',
-			    'padding': '6px'
-			}, children = [
-		html.Br(),
-		html.Br(),	
-        html.Div(
-            [
-                html.Div(
-                    [
-                        html.P('Choose Province:'),
-                        dcc.Checklist(
-                                id = 'Cities',
-                                options=[
-                                    {'label': 'Al Qādisīyah', 'value': 'Al Qādisīyah'},
-                                    {'label': 'Bābil', 'value': 'Bābil'},
-                                ],
-                                value=['Bābil', 'Al Qādisīyah'],
-                                labelStyle={'display': 'inline-block'}
-                        ),
-                    ],
-                    className='six columns',
-                    style={'margin-top': '10'}
-                ),
-                html.Div(
-                    [
-                        html.P('Choose Region:'),
-                        dcc.RadioItems(
-                                id = 'Country',
-                                options=[{'label': k, 'value': k} for k in all_options_t.keys()],
-                                value='All',
-                                labelStyle={'display': 'inline-block'}
-                        ),
-                    ],
-                    className='six columns',
-                    style={'margin-top': '10'}
-                ),    
-            ], className="row"
-        ),
-
-        html.Div(
-            [
-            html.Div([
-                dcc.Graph(
-                    id='example-graph'
-                        )
-                    ], className= 'six columns'
-                ),
-
-                html.Div([
-                dcc.Graph(
-                    id='example-graph-2',
-
-                )
-                ], className= 'six columns'
-                )
-            ], className="row")
-		])
-	],className = 'ten columns offset-by-one')
-])	
-
+									#CALL BACK
+########################################################################################
+########################################################################################
 
 @app.callback(
     Output('Product', 'options'),
