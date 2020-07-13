@@ -12,7 +12,7 @@ import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
 from reshape import reshape
-
+import base64
 
 
 url = 'https://github.com/Mahyarazad/mahyarazad/raw/master/Base.xlsx'
@@ -246,6 +246,8 @@ table.update_layout(
 ####### Main App ######
 server = flask.Flask(__name__)
 server.secret_key = os.environ.get('secret_key', str(randint(0, 1000000)))
+image_filename = 'BarchartRace.gif'
+encoded_image = base64.b64encode(open(image_filename, 'rb').read()).decode('ascii')
 
 app = dash.Dash(__name__,server=server,
                 external_stylesheets = [
@@ -257,6 +259,7 @@ app = dash.Dash(__name__,server=server,
 # app.css.config.serve_locally = True
 app.title = 'Iraq Device Business Summary'
 app.layout = html.Div([
+
 	# html.Link(href='regionaldata.css', rel='stylesheet'),
 	dcc.Tabs([
 		dcc.Tab(label='HUAWEI Distribution and Sales Figure',style = {
@@ -272,6 +275,10 @@ app.layout = html.Div([
 			    'color': 'white',
 			    'padding': '6px'
 			},children=[
+			html.H2('2019 Sales Overview in Middle east, Africa and, North Africa'),
+			html.Br(),
+			html.Div(html.Img(src='data:image/gif;base64,{}'.format(encoded_image)),
+			className = 'row'),
 			html.H2('Iraq Activated Stock Distribution'),
 			html.Div(
 	            [
