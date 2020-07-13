@@ -94,7 +94,7 @@ class reshape:
 	def geo(self):
 
 		self.df[self.df.columns[-2]] = self.df[self.df.columns[-2]].dt.strftime('%Y-%m')
-		cv = pd.read_excel('D:/Data/Py_Files/Iraq_demographic.xlsx')
+		cv = pd.read_excel('https://github.com/Mahyarazad/mahyarazad/blob/master/Iraq_demographic.xlsx?raw=true')
 		self.df = pd.pivot_table(self.df,index = self.df.columns[1],columns=self.df.columns[-2] ,values = self.df.columns[-1],aggfunc = np.sum).reset_index()
 		ts = pd.concat([self.df[self.df.iloc[:,0]!='Iraq'],self.df[self.df.iloc[:,0]!='SOURCE IS NULL']],ignore_index = True)
 		SIN = pd.concat([self.df[self.df.iloc[:,0]=='Iraq'],self.df[self.df.iloc[:,0]=='SOURCE IS NULL']],ignore_index = True)
