@@ -2,7 +2,7 @@ import os
 from random import randint
 import flask
 import dash
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
 import dash_bootstrap_components as dbc
 import dash_table
 import dash_core_components as dcc
@@ -109,7 +109,6 @@ all_options_p = {'HUAWEI': ['All',
 							'HONOR 20',
 							'HONOR 10i',
 							'Honor 10 Lite']}
-
 
 pd_list = {'Product':['Mate 30 Pro',
                 'nova 5T',
@@ -244,15 +243,17 @@ table.update_layout(
 
 
 ####### Main App ######
+
+
 server = flask.Flask(__name__)
 server.secret_key = os.environ.get('secret_key', str(randint(0, 1000000)))
 image_filename = 'BarchartRace.gif'
 encoded_image = base64.b64encode(open(image_filename, 'rb').read()).decode('ascii')
 
-app = dash.Dash(__name__,server=server,
-                external_stylesheets = [
-        'https://codepen.io/chriddyp/pen/bWLwgP.css'
-    ]
+app = dash.Dash(__name__,server=server
+    #             external_stylesheets = [
+    #     'https://codepen.io/chriddyp/pen/bWLwgP.css'
+    # ]
                 )
 
 # app.scripts.config.serve_locally = True
@@ -372,13 +373,12 @@ app.layout = html.Div([
        				    html.Div([
                         html.Div([
 				    	html.Br(),
-				    	html.Br(),
 					    html.Div(id='output-text',   style = {
 					    'color' : '#070200',
 					    'background-color' : '#EFEEEE',
 					    'text-margin':'center',
 					    'width':'auto',
-					    'font-family': "Lato",
+					    'font-family': 'Helvetica',
 					    'margin-left':'0px',
 					    'font-size': '15px'
 
@@ -390,21 +390,19 @@ app.layout = html.Div([
 							options=[{'label': k, 'value': k} for k in all_options.keys()],
 					        labelStyle={'display': 'inline-block'}
 					        ),
-					    html.Br(),
-					    dcc.Checklist(
+                        dcc.Checklist(
 					        id = 'Account',
 					        value = ['Euro','Global'],
 					        options= [{'label': 'Euro', 'value' : 'Euro'},{'label': 'Global', 'value' : 'Global'}],
 					        labelStyle={'display': 'inline-block'}
 					        ),
-					    html.Br(),
+
 					    dcc.RadioItems(
 					        id = 'NS',
 					        value = 'South',
 							options=[{'label': k, 'value': k} for k in north_south.keys()],
 					        labelStyle={'display': 'inline-block'}
 					        ),
-					    html.Br(),
 					    dcc.Dropdown(
 					    id = 'Province',
 					    multi = True,
@@ -413,7 +411,6 @@ app.layout = html.Div([
 					    options=[
 					        {'label': i, 'value':i} for i in sd[sd.columns[0]].unique()]
 					    ),
-					    html.Br(),
 					    dcc.Dropdown(
 					    id = 'Product',
 					    style={'height': '30px', 'width': '200px'},
@@ -428,74 +425,21 @@ app.layout = html.Div([
 					),
 				    
 				    html.Div([
-				        dcc.Graph(
-				            id='sell_out',
-				            )        
-				    ],className = 'nine columns'),
-                    ],
-                    className = "row"),
-                    html.Div([
-                        html.Div([
-                            html.Div(id='output-text2',   style = {
-                            'color' : '#070200',
-                            'background-color' : '#EFEEEE',
-                            'text-margin':'center',
-                            'width':'auto',
-                            'font-family': "Lato",
-                            'margin-left':'0px',
-                            'font-size': '15px'
-
-                            },children = ''),
-                            html.Br(),
-                            dcc.RadioItems(
-                                id = 'Brand2',
-                                value = 'HONOR',
-                                options=[{'label': k, 'value': k} for k in all_options.keys()],
-                                labelStyle={'display': 'inline-block'}
-                                ),
-                            html.Br(),
-                            dcc.Checklist(
-                                id = 'Account2',
-                                value = ['Euro','Global'],
-                                options= [{'label': 'Euro', 'value' : 'Euro'},{'label': 'Global', 'value' : 'Global'}],
-                                labelStyle={'display': 'inline-block'}
-                                ),
-                            html.Br(),
-                            dcc.RadioItems(
-                                id = 'NS2',
-                                value = 'South',
-                                options=[{'label': k, 'value': k} for k in north_south.keys()],
-                                labelStyle={'display': 'inline-block'}
-                                ),
-                            html.Br(),
-                            dcc.Dropdown(
-                            id = 'Province2',
-                            multi = True,
-                            style={'height': '400px !important', 'width': '200px','font-size': "100%",'border-radius': '6px'},
-                            value = 'All',
-                            options=[
-                                {'label': i, 'value':i} for i in sd[sd.columns[0]].unique()]
-                            ),
-                            html.Br(),
-                            dcc.Dropdown(
-                            id = 'Product2',
-                            style={'height': '30px', 'width': '200px'},
-                            value = 'Baghdād',
-                            multi = True,
-                            options=[
-                                {'label': i, 'value':i} for i in sd[sd.columns[3]].unique()
-                                ] 
-                            ),
-                            html.Br()
-                            ],className = 'three columns'
-                        ),
-                        
-                        html.Div([
-                            dcc.Graph(
-                                id='sell_out2',
-                                )        
-                        ],className = 'nine columns'),
-                    ],className = "row"),    
+				        dcc.Graph(id='sell_out'),
+    				    dcc.RangeSlider(
+    				    	id = 'Slider',
+                        	min = 0,
+                        	max = 55,
+                        	value = [1,55],
+                        	step= 1,
+                    	    marks={
+						        0: {'label': sd.columns[4].strftime("%m/%d/%Y"), 'style': {'color': '#050000'}},
+						        55: {'label': sd.columns[-1].strftime("%m/%d/%Y"), 'style': {'color': '#050000'}}
+						    },
+						    updatemode='drag'
+                        	),     
+				    ],className = 'nine columns')],
+                    className = "row")
                 ]),
  	],className = 'ten columns offset-by-one')
 ],className = 'ten columns offset-by-one')	
@@ -534,26 +478,26 @@ def set_cities_options(selected_region):
     Output('output-text','children'),
     [Input('Province','value'),
     Input('Account','value'),
-    Input('Brand','value'),
     Input('Product','value')])
-def update_text(province,account,brand,product):
+def update_text(province,account,product):
 
-    return '{} Province,{} account and, {} product has been selected'.format(province,account,product,sd[sd.columns[1]].isin(all_options[brand]).index[4:])
+    return '{} Province,{} account and, {} product has been selected'.format(province,account,product)
 
 @app.callback(
     Output('sell_out','figure'),
     [Input('Brand','value'),
     Input('Province','value'),
     Input('Account','value'),
-    Input('Product','value')])
+    Input('Product','value'),
+    Input('Slider','value')])
 
-def sell_out(brand,province,account,product):
+def sell_out(brand,province,account,product,value):
 	if brand == "HUAWEI":
 		color = 'E94713' 
 	else:
 		color = '3CBCD6'
-	data = [{'x': sd[(sd[sd.columns[0]].isin(province))&(sd[sd.columns[3]].isin(product))&(sd[sd.columns[1]].isin(account))].sum().index[4:],
-            'y': sd[(sd[sd.columns[0]].isin(province))&(sd[sd.columns[3]].isin(product))&(sd[sd.columns[1]].isin(account))].sum().values[4:],
+	data = [{'x': sd[(sd[sd.columns[0]].isin(province))&(sd[sd.columns[3]].isin(product))&(sd[sd.columns[1]].isin(account))].sum().index[4:][value[0]:value[1]],
+            'y': sd[(sd[sd.columns[0]].isin(province))&(sd[sd.columns[3]].isin(product))&(sd[sd.columns[1]].isin(account))].sum().values[4:][value[0]:value[1]],
             'type': 'line',
             'marker': {'color': color}}]
 
@@ -576,86 +520,6 @@ def sell_out(brand,province,account,product):
                 size=10,
                 color='#7f7f7f'),
 
-                
-            ),
-            'transition': {
-            	'duration' : 500,
-            	'easing' : 'cubic-in-out' 	
-            	}    
-        }
-    }
-
-	return figure
-################## Second Chart #################
-@app.callback(
-    Output('Product2', 'options'),
-    [Input('Brand2', 'value')])
-
-def set_product_options(selected_brand_for_product2):
-
-	return [{'label': i, 'value': i} for i in all_options_p[selected_brand_for_product2]]
-
-@app.callback(
-    Output('Account2', 'options'),
-    [Input('Brand2', 'value')])
-
-def set_brands_options(selected_brand2):
-
-	return [{'label': i, 'value': i} for i in all_options[selected_brand2]]
-
-@app.callback(
-    Output('Province2', 'options'),
-    [Input('NS2', 'value')])
-
-def set_cities_options(selected_region2):
-
-	return [{'label': i, 'value': i} for i in north_south[selected_region2]]
-
-
-@app.callback(
-    Output('output-text2','children'),
-    [Input('Province2','value'),
-    Input('Account2','value'),
-    Input('Brand2','value'),
-    Input('Product2','value')])
-def update_text(province2,account2,brand2,product2):
-
-    return '{} Province,{} account and, {} product has been selected'.format(province2,account2,product2,sd[sd.columns[1]].isin(all_options[brand2]).index[4:])
-
-@app.callback(
-    Output('sell_out2','figure'),
-    [Input('Brand2','value'),
-    Input('Province2','value'),
-    Input('Account2','value'),
-    Input('Product2','value')])
-
-def sell_out(brand2,province2,account2,product2):
-	if brand2 == "HUAWEI":
-		color = 'E94713' 
-	else:
-		color = '3CBCD6'
-	data = [{'x': sd[(sd[sd.columns[0]].isin(province2))&(sd[sd.columns[3]].isin(product2))&(sd[sd.columns[1]].isin(account2))].sum().index[4:],
-            'y': sd[(sd[sd.columns[0]].isin(province2))&(sd[sd.columns[3]].isin(product2))&(sd[sd.columns[1]].isin(account2))].sum().values[4:],
-            'type': 'line',
-            'marker': {'color': color}}]
-
-	figure = {
-        'data': data,
-        'layout': {
-            'title': province2,
-            'xaxis' : dict(
-                titlefont=dict(
-                family='Courier New, monospace',
-                size=10,
-                color='#7f7f7f'),
-                
-
-            ),
-            'yaxis' : dict(
-                titlefont=dict(
-                family='Helvetica, monospace',
-                size=10,
-                color='#7f7f7f'),
                 
             ),
             'transition': {
