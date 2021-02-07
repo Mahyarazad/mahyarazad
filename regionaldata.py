@@ -200,7 +200,7 @@ fig.update_layout(
     hovermode='closest',
     showlegend=False,
     mapbox=dict(
-        accesstoken='pk.eyJ1IjoibWFoeWFyYXphZCIsImEiOiJjazh3cHk2eWUwY3huM29xb29meXV1bGV2In0.kKV6XDb8gngFsl4EZMeXPg',
+        accesstoken= ENV['mapBox'] ,
         bearing=0,
         center=dict(
             lat=33.67,
