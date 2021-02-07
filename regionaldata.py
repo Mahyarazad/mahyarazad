@@ -17,7 +17,7 @@ import base64
 
 url = 'https://github.com/Mahyarazad/mahyarazad/raw/master/Base.xlsx'
 df = pd.read_excel(url)
-
+mapbox_secrect_key = os.environ.get('mapBox')
 #####  DataFrame Reshaping #####
 sd = reshape(df).summation
 city_data = reshape(df).dict_data_gen
@@ -200,7 +200,7 @@ fig.update_layout(
     hovermode='closest',
     showlegend=False,
     mapbox=dict(
-        accesstoken= ENV['mapBox'] ,
+        accesstoken= mapbox_secrect_key ,
         bearing=0,
         center=dict(
             lat=33.67,
